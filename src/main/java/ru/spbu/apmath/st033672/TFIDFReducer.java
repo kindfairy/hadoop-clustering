@@ -9,26 +9,26 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public class TFIDFReducer extends Reducer<Text, DocNameDouble, Text, DocNameDouble> {
+public class TFIDFReducer extends Reducer<Text, StringDouble, Text, StringDouble> {
 
     private int docNum = 18828;
 
     @Override
-    public void reduce(Text word, Iterable<DocNameDouble> values, Context context)
+    public void reduce(Text word, Iterable<StringDouble> values, Context context)
             throws IOException, InterruptedException {
 
         /*
-        for( DocNameDouble value: values ){
+        for( StringDouble value: values ){
             context.write(word, value);
         }
         */
 
 
-        List<DocNameDouble> list = new ArrayList<>();
+        List<StringDouble> list = new ArrayList<>();
         int df = 0;
-        Iterator<DocNameDouble> iterator = values.iterator();
+        Iterator<StringDouble> iterator = values.iterator();
         while (iterator.hasNext()) {
-            list.add(new DocNameDouble(iterator.next()));
+            list.add(new StringDouble(iterator.next()));
             df++;
         }
 
@@ -44,7 +44,7 @@ public class TFIDFReducer extends Reducer<Text, DocNameDouble, Text, DocNameDoub
         iterator = list.iterator();
 
         while (iterator.hasNext()) {
-            DocNameDouble docNameDouble = iterator.next();
+            StringDouble docNameDouble = iterator.next();
             double oldValue = docNameDouble.getValue();
             double newValue = oldValue * Math.log(((double) docNum / (double) df));
             //double newValue = Math.log(((double) docNum / (double) df));

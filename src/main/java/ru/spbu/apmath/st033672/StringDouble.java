@@ -10,22 +10,22 @@ import java.io.IOException;
 /**
  * Created by henry on 4/30/17.
  */
-public class DocNameDouble implements Writable {
+public class StringDouble implements Writable {
 
 
-    private String docName;
+    private String string;
     private double value;
 
-    public DocNameDouble() {
+    public StringDouble() {
     }
 
-    public DocNameDouble(String docName, double value) {
-        this.docName = docName;
+    public StringDouble(String docName, double value) {
+        this.string = docName;
         this.value = value;
     }
 
-    public DocNameDouble(DocNameDouble that){
-        this.docName = that.docName;
+    public StringDouble(StringDouble that){
+        this.string = that.string;
         this.value = that.value;
     }
 
@@ -39,18 +39,18 @@ public class DocNameDouble implements Writable {
 
     @Override
     public void write(DataOutput dataOutput) throws IOException {
-        dataOutput.writeUTF(docName);
+        dataOutput.writeUTF(string);
         dataOutput.writeDouble(value);
     }
 
     @Override
     public void readFields(DataInput dataInput) throws IOException {
-        docName = dataInput.readUTF();
+        string = dataInput.readUTF();
         value = dataInput.readDouble();
     }
 
     @Override
     public String toString() {
-        return docName + "\t" + value;
+        return string + "\t" + value;
     }
 }

@@ -63,23 +63,41 @@ public class Main extends Configured implements Tool {
         //tfidfJob.setInputFormatClass(FileInputFormat.class);
         tfidfJob.setInputFormatClass(ArticleInputFormat.class);
 
-        //TODO
 		tfidfJob.setMapperClass(TFIDFMapper.class);
 		tfidfJob.setMapOutputKeyClass(Text.class);
-		tfidfJob.setMapOutputValueClass(DocNameDouble.class);
+		tfidfJob.setMapOutputValueClass(StringDouble.class);
 
 		tfidfJob.setReducerClass(TFIDFReducer.class);
 
         //No custom OutpitFormat
 
+        if ( !tfidfJob.waitForCompletion(true) ) return 1;
 
 
 
+
+        //step 2 reduceByDoc, Write to Couchdb
+        Job toCouchDBJob = Job.getInstance(getConf());
+        toCouchDBJob.setJarByClass(Main.class);
+        toCouchDBJob.setJobName("toCouchDB");
+        FileInputFormat.addInputPath(toCouchDBJob, new Path(args[1]));
+        FileOutputFormat.setOutputPath(toCouchDBJob, new Path(args[2]));
+
+        //TODO
+        toCouchDBJob.setInputFormatClass(TFIDFInputFormat.class);
+
+        //TODO
+        toCouchDBJob.setMapperClass(ToCouchDBMapper.class);
+        toCouchDBJob.setMapOutputKeyClass(Text.class);
+        toCouchDBJob.setMapOutputValueClass(StringDouble.class);
+
+        toCouchDBJob.setReducerClass(ToCouchDBReducer.class);
 
         System.out.println("Input dirs: " + Arrays.toString(FileInputFormat.getInputPaths(tfidfJob)));
         System.out.println("Output dir: " + FileOutputFormat.getOutputPath(tfidfJob));
+        System.out.println("Output dir: " + FileOutputFormat.getOutputPath(toCouchDBJob));
 
-        return tfidfJob.waitForCompletion(true) ? 0 : 1;
+        return toCouchDBJob.waitForCompletion(true) ? 0 : 1;
 
 		
 

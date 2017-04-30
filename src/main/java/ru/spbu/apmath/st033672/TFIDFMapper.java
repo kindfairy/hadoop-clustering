@@ -15,7 +15,7 @@ import java.io.*;
 import java.util.*;
 
 
-public class TFIDFMapper extends Mapper<Text, Text, Text, DocNameDouble> {
+public class TFIDFMapper extends Mapper<Text, Text, Text, StringDouble> {
 
     public void map(Text docName, Text docText, Context context)
             throws IOException, InterruptedException {
@@ -49,7 +49,7 @@ public class TFIDFMapper extends Mapper<Text, Text, Text, DocNameDouble> {
 
         for (Map.Entry<String, Double> entry : map.entrySet()) {
             context.write(new Text(entry.getKey()),
-                    new DocNameDouble(docName.toString(), entry.getValue() / total));
+                    new StringDouble(docName.toString(), entry.getValue() / total));
         }
 
         stream.end();
