@@ -1,0 +1,4 @@
+target/
+.idea/
+hadoop-clustering.iml
+dependency-reduced-pom.xml
