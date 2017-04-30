@@ -3,9 +3,6 @@ package ru.spbu.apmath.st033672;
 
 import org.apache.hadoop.io.*;
 import org.apache.hadoop.mapreduce.*;
-import org.apache.hadoop.mapreduce.lib.input.*;
-import org.apache.hadoop.mapreduce.lib.output.*;
-import org.apache.hadoop.util.*;
 import org.apache.lucene.analysis.*;
 
 import org.apache.lucene.analysis.en.PorterStemFilter;
@@ -18,13 +15,13 @@ import java.io.*;
 import java.util.*;
 
 
-public class WordCountMapper extends Mapper<Text, Text, DocNameWord, IntWritable> {
+public class TFIDFMapper extends Mapper<Text, Text, Text, DocNameDouble> {
 
-    public void map(Text key, Text value, Context context)
+    public void map(Text docName, Text docText, Context context)
             throws IOException, InterruptedException {
 
         //abstract
-        Reader reader = new StringReader(value.toString());
+        Reader reader = new StringReader(docText.toString());
         Analyzer analyzer = new StandardAnalyzer();
 
         //with PorterStemmer
@@ -33,15 +30,28 @@ public class WordCountMapper extends Mapper<Text, Text, DocNameWord, IntWritable
         //without PorterStemmer
         //TokenStream stream = analyzer.tokenStream(null, reader);
 
+        Map<String, Double> map = new HashMap<>();
 
+        double total = 0.0;
 
         stream.reset();
         while (stream.incrementToken()) {
             String token = stream
                     .getAttribute(CharTermAttribute.class)
                     .toString();
-            context.write(new DocNameWord(key.toString(), token), new IntWritable(1));
+            if (map.containsKey(token)) {
+                map.put(token, map.get(token) + 1.0);
+            } else {
+                map.put(token, 1.0);
+            }
+            total++;
         }
+
+        for (Map.Entry<String, Double> entry : map.entrySet()) {
+            context.write(new Text(entry.getKey()),
+                    new DocNameDouble(docName.toString(), entry.getValue() / total));
+        }
+
         stream.end();
         stream.close();
 

@@ -9,7 +9,6 @@ import org.apache.hadoop.mapreduce.lib.input.*;
 import org.apache.hadoop.mapreduce.lib.output.*;
 import org.apache.hadoop.util.*;
 
-import java.io.*;
 import java.util.*;
 
 public class Main extends Configured implements Tool {
@@ -23,10 +22,11 @@ public class Main extends Configured implements Tool {
 
 
 		//0 docs
-		//1 docs after tokenization
-        if (args.length != 2) {
+		//1 after tokenization
+        //2 after calculations document frequency
+        if (args.length != 3) {
 			ToolRunner.printGenericCommandUsage(System.err);
-            System.err.println("USAGE: hadoop jar ... <input-dir> <output-dir>");
+            System.err.println("USAGE: hadoop jar ... <input-dir> <output-dir> <output-dir>");
             System.exit(1);
         }
 
@@ -50,35 +50,36 @@ public class Main extends Configured implements Tool {
 		*/
 
 
-		Job wcJob = Job.getInstance(getConf());
-        wcJob.setJarByClass(Main.class);
-		wcJob.setJobName("WordCount");
-        FileInputFormat.addInputPath(wcJob, new Path(args[0]));
-        FileOutputFormat.setOutputPath(wcJob, new Path(args[1]));
+
+
+        //step 1   tf
+        //filename - text -> [ filename word n/N ]
+        Job tfidfJob = Job.getInstance(getConf());
+        tfidfJob.setJarByClass(Main.class);
+        tfidfJob.setJobName("TFIDF");
+        FileInputFormat.addInputPath(tfidfJob, new Path(args[0]));
+        FileOutputFormat.setOutputPath(tfidfJob, new Path(args[1]));
+
+        //tfidfJob.setInputFormatClass(FileInputFormat.class);
+        tfidfJob.setInputFormatClass(ArticleInputFormat.class);
+
+        //TODO
+		tfidfJob.setMapperClass(TFIDFMapper.class);
+		tfidfJob.setMapOutputKeyClass(Text.class);
+		tfidfJob.setMapOutputValueClass(DocNameDouble.class);
+
+		tfidfJob.setReducerClass(TFIDFReducer.class);
+
+        //No custom OutpitFormat
 
 
 
-        //wcJob.setInputFormatClass(FileInputFormat.class);
-		wcJob.setInputFormatClass(ArticleInputFormat.class);
-		
-		//TODO Mapper
-		wcJob.setMapperClass(WordCountMapper.class);
-
-		wcJob.setMapOutputKeyClass(DocNameWord.class);
-		wcJob.setMapOutputValueClass(IntWritable.class);
-
-		//TODO Reducer
-        wcJob.setReducerClass(WordCountReducer.class);
 
 
+        System.out.println("Input dirs: " + Arrays.toString(FileInputFormat.getInputPaths(tfidfJob)));
+        System.out.println("Output dir: " + FileOutputFormat.getOutputPath(tfidfJob));
 
-        //TODO OutputFormat
-		//job.setOutputFormatClass(WordFrequencyOutputFormat.class);
-
-        System.out.println("Input dirs: " + Arrays.toString(FileInputFormat.getInputPaths(wcJob)));
-        System.out.println("Output dir: " + FileOutputFormat.getOutputPath(wcJob));
-
-        return wcJob.waitForCompletion(true) ? 0 : 1;
+        return tfidfJob.waitForCompletion(true) ? 0 : 1;
 
 		
 

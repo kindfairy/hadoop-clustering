@@ -9,7 +9,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>Hadoop Clustering</name>
-  <description>maven hadoop tf-idf k-means couchdb</description>
+  <description>maven hadoop value-idf k-means couchdb</description>
   <url>http://apmath.spbu.ru/</url>
 
   <properties>
