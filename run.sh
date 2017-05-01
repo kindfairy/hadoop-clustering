@@ -1,5 +1,5 @@
 #!/bin/sh
-inputdir="/home/rstm2013/20groups-small"
+inputdir="/home/rstm2013/20groups"
 gluster="/mnt/root"
 prefix1="tfidf-"
 prefix2="output-"

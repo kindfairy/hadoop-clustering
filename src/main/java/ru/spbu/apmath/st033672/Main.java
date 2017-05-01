@@ -83,15 +83,16 @@ public class Main extends Configured implements Tool {
         FileInputFormat.addInputPath(toCouchDBJob, new Path(args[1]));
         FileOutputFormat.setOutputPath(toCouchDBJob, new Path(args[2]));
 
-        //TODO
         toCouchDBJob.setInputFormatClass(TFIDFInputFormat.class);
 
-        //TODO
         toCouchDBJob.setMapperClass(ToCouchDBMapper.class);
         toCouchDBJob.setMapOutputKeyClass(Text.class);
         toCouchDBJob.setMapOutputValueClass(StringDouble.class);
 
         toCouchDBJob.setReducerClass(ToCouchDBReducer.class);
+
+        //TODO
+        toCouchDBJob.setOutputFormatClass(TFIDFOutputFormat.class);
 
         System.out.println("Input dirs: " + Arrays.toString(FileInputFormat.getInputPaths(tfidfJob)));
         System.out.println("Output dir: " + FileOutputFormat.getOutputPath(tfidfJob));
